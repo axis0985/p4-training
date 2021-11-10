@@ -113,7 +113,7 @@ def main(p4info_file_path, bmv2_file_path):
         print("Installed P4 Program using SetForwardingPipelineConfig on s3")
 
         # Modify the following code to insert your own tabel entries
-        
+        # Note: if you use ternary match fields, you must specify the priority of the table entry
         # table_entry = p4info_helper.buildTableEntry(
         #     table_name="MyIngress.myTunnel_exact",
         #     match_fields={
