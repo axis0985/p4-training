@@ -51,6 +51,24 @@ header icmp_h {
     bit<16> checksum;
 }
 
+header gtp_u_h {
+    bit<3>  version;    /* version */
+    bit<1>  pt;         /* protocol type */
+    bit<1>  spare;      /* reserved */
+    bit<1>  ex_flag;    /* whether there is an extension header optional field */
+    bit<1>  seq_flag;   /* whether there is a Sequence Number optional field */
+    bit<1>  npdu_flag;  /* whether there is a N-PDU number optional field */
+    bit<8>  msgtype;    /* message type */
+    bit<16> msglen;     /* length of the payload in octets */
+    bit<32> teid;       /* tunnel endpoint id */
+}
+
+header gtp_u_options_h {
+    bit<16> seq_num;
+    bit<8>  n_pdu_num; 
+    bit<8>  next_ext;
+}
+
 // TCP Header
 header tcp_h {
     bit<16> src_port;
@@ -68,9 +86,19 @@ header tcp_h {
 // user-defined packet headers stack
 struct headers_t {
     // make your protocol stacks here
+    ethernet_h eth;
+    arp_h arp;
+    ipv4_h ipv4;
+    udp_h udp;
+    tcp_h tcp;
+    gtp_u_h gtp_u;
+    gtp_u_h gtp_u_options;
+    ipv4_h inner_ipv4;
 }
 // user-defined metadata
 struct local_metadata_t {
+    bit<32> encap_teid;
+    bit<1> encap_flag;
 }
 
 

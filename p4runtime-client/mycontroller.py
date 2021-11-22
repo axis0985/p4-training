@@ -126,10 +126,77 @@ def main(p4info_file_path, bmv2_file_path):
         # })
         # s1.WriteTableEntry(table_entry)
 
+        table_entry = p4info_helper.buildTableEntry(
+            table_name="fwd_table",
+            match_fields={
+                "hdr.ipv4.dst_addr": 0x0a000202
+            },
+            action_name = "fwd_encap",
+            action_params = {
+                "port": 2,
+                "teid": 111
+        })
+        s1.WriteTableEntry(table_entry)
+
+        table_entry = p4info_helper.buildTableEntry(
+            table_name="ingress_block.fwd_table",
+            match_fields={
+                "hdr.ipv4.dst_addr": 0x0a000202
+            },
+            action_name="ingress_block.fwd",
+            action_params={
+                "port": 2
+        })
+        s2.WriteTableEntry(table_entry)
+
+        table_entry = p4info_helper.buildTableEntry(
+            table_name="ingress_block.fwd_table",
+            match_fields={
+                "hdr.ipv4.dst_addr": 0x0a000202
+            },
+            action_name="ingress_block.fwd_decap",
+            action_params={
+                "port": 2
+        })
+        s3.WriteTableEntry(table_entry)
+
+
+        table_entry = p4info_helper.buildTableEntry(
+            table_name="ingress_block.fwd_table",
+            match_fields={
+                "hdr.ipv4.dst_addr": 0x0a000101
+            },
+            action_name="ingress_block.fwd",
+            action_params={
+                "port": 1
+        })
+        s1.WriteTableEntry(table_entry)
+        
+        table_entry = p4info_helper.buildTableEntry(
+            table_name="ingress_block.fwd_table",
+            match_fields={
+                "hdr.ipv4.dst_addr": 0x0a000101
+            },
+            action_name="ingress_block.fwd",
+            action_params={
+                "port": 1
+        })
+        s2.WriteTableEntry(table_entry)
+
+        table_entry = p4info_helper.buildTableEntry(
+            table_name="ingress_block.fwd_table",
+            match_fields={
+                "hdr.ipv4.dst_addr": 0x0a000101
+            },
+            action_name="ingress_block.fwd",
+            action_params={
+                "port": 1
+        })
+        s3.WriteTableEntry(table_entry)
+
         readTableRules(p4info_helper, s1)
         readTableRules(p4info_helper, s2)
         readTableRules(p4info_helper, s3)
-
 
         while(True):
             sleep(1)
