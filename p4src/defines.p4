@@ -9,6 +9,14 @@
 #define UDP_HDR_SIZE 8
 #define MAX_PORTS     255
 
+#define GTP_HDR_SIZE 8
+#define GTP_OPTION_FIELDS_SIZE 4
+#define GTP_EXT_HDR_SIZE 4
+#define GTPU_VERSION 0x01
+#define GTP_PROTOCOL_TYPE_GTP 0x01
+#define GTP_GPDU 0xff
+#define GTP_PDU_SES_CONT_TYPE 0x85
+
 typedef bit<48>  mac_addr_t;
 typedef bit<32>  ipv4_addr_t;
 
