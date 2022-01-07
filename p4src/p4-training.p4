@@ -18,9 +18,33 @@ control ingress_block(inout headers_t hdr,
 
     // define your table here
     // forwarding should be done in ingress
+	action drop() {
+		mark_to_drop(standard_metadata);
+	}
+
+	action fwd(bit<9> port) {
+		standard_metadata.egress_spec = port;
+	}
+
+	table simple_table {
+		key = {
+			standard_metadata.ingress_port: exact;
+		}
+		actions = {
+			drop;
+			fwd;
+		}
+		size = 256;
+		const default_action = drop();
+		const entries = {
+			9w1: fwd(2);
+			9w2: fwd(1);
+		}
+	}
 
     apply {
         // Don't forget to apply table
+		simple_table.apply();
     }
 }
 

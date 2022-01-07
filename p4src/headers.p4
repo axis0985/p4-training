@@ -68,6 +68,9 @@ header tcp_h {
 // user-defined packet headers stack
 struct headers_t {
     // make your protocol stacks here
+	ethernet_h eth;
+	arp_h arp;
+	ipv4_h ipv4;
 }
 // user-defined metadata
 struct local_metadata_t {
