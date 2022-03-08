@@ -8,9 +8,15 @@ parser ingress_parser(packet_in packet,
         packet.extract(hdr.eth);
 		transition select(hdr.eth.ether_type) {
 			0x0800: parse_ipv4;
+            0x0999: parse_tunnel;
 			0x0806: parse_arp;
 			default: accept;
 		}
+    }
+
+    state parse_tunnel {
+        packet.extract(hdr.tunnel);
+        transition accept;
     }
 	
 	state parse_ipv4 {
@@ -39,6 +45,7 @@ control egress_deparser(packet_out packet,
     apply {
         // deparse the packet headers here
         packet.emit(hdr.eth);
+        packet.emit(hdr.tunnel);
         packet.emit(hdr.arp);
         packet.emit(hdr.ipv4);
     }

@@ -26,6 +26,25 @@ control ingress_block(inout headers_t hdr,
 		standard_metadata.egress_spec = port;
 	}
 
+    action decap() {
+        hdr.eth.ether_type = hdr.tunnel.original_ether_type;
+        hdr.tunnel.setInvalid();
+    }
+
+    action encap() {
+        local_metadata.encap_flag = 1w1;
+    }
+
+    action fwd_decap(bit<9> port) {
+        fwd(port);
+        decap();
+    }
+
+    action fwd_encap(bit<9> port) {
+        fwd(port);
+        encap();
+    }
+
 	table simple_table {
 		key = {
 			standard_metadata.ingress_port: exact;
@@ -33,13 +52,11 @@ control ingress_block(inout headers_t hdr,
 		actions = {
 			drop;
 			fwd;
+            fwd_decap;
+            fwd_encap;
 		}
 		size = 256;
 		const default_action = drop();
-		const entries = {
-			9w1: fwd(2);
-			9w2: fwd(1);
-		}
 	}
 
     apply {
@@ -51,8 +68,16 @@ control ingress_block(inout headers_t hdr,
 control egress_block(inout headers_t hdr,
                      inout local_metadata_t local_metadata,
                      inout standard_metadata_t standard_metadata) {
+    action encap_tunnel() {
+        hdr.tunnel.setValid();
+        hdr.tunnel.original_ether_type = hdr.eth.ether_type;
+        hdr.eth.ether_type = 0x0999;
+        hdr.tunnel.id = 8w23;
+    }
     apply {
-
+        if (local_metadata.encap_flag == 1w1) {
+            encap_tunnel();
+        }
     }
 }
 // V1Model: parser > checksum > ingress > PRE/TM > egress > checksum > deparser

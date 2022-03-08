@@ -113,19 +113,49 @@ def main(p4info_file_path, bmv2_file_path):
         print("Installed P4 Program using SetForwardingPipelineConfig on s3")
 
         # Modify the following code to insert your own tabel entries
-        # Note: if you use ternary match fields, you must specify the priority of the table entry
-        # table_entry = p4info_helper.buildTableEntry(
-        #     table_name="MyIngress.myTunnel_exact",
-        #     match_fields={
-        #         "hdr.myTunnel.dst_id": tunnel_id
-        #     },
-        #     action_name="MyIngress.myTunnel_egress",
-        #     action_params={
-        #         "dstAddr": dst_eth_addr,
-        #         "port": SWITCH_TO_HOST_PORT
-        # })
-        # s1.WriteTableEntry(table_entry)
+        table_entry = p4info_helper.buildTableEntry(
+            table_name="simple_table",
+            match_fields={
+                "standard_metadata.ingress_port": 1
+            },
+            action_name="fwd_encap",
+            action_params={
+                "port": 3
+        })
+        s1.WriteTableEntry(table_entry)
 
+        table_entry = p4info_helper.buildTableEntry(
+            table_name="simple_table",
+            match_fields={
+                "standard_metadata.ingress_port": 3
+            },
+            action_name="fwd_decap",
+            action_params={
+                "port": 1
+        })
+        s1.WriteTableEntry(table_entry)
+
+        table_entry = p4info_helper.buildTableEntry(
+            table_name="simple_table",
+            match_fields={
+                "standard_metadata.ingress_port": 2
+            },
+            action_name="fwd_encap",
+            action_params={
+                "port": 3
+        })
+        s3.WriteTableEntry(table_entry)
+
+        table_entry = p4info_helper.buildTableEntry(
+            table_name="simple_table",
+            match_fields={
+                "standard_metadata.ingress_port": 3
+            },
+            action_name="fwd_decap",
+            action_params={
+                "port": 2
+        })
+        s3.WriteTableEntry(table_entry)
         readTableRules(p4info_helper, s1)
         readTableRules(p4info_helper, s2)
         readTableRules(p4info_helper, s3)

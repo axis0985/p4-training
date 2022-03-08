@@ -10,6 +10,13 @@ header ethernet_h {
     bit<16> ether_type;
 }
 
+// 0x0999
+// Tunneling Header
+header tunnel_h {
+    bit<8> id;
+    bit<16> original_ether_type;
+}
+
 // IPV4 Header
 header ipv4_h {
     bit<4>  version;
@@ -69,11 +76,14 @@ header tcp_h {
 struct headers_t {
     // make your protocol stacks here
 	ethernet_h eth;
+    tunnel_h tunnel;
 	arp_h arp;
 	ipv4_h ipv4;
 }
 // user-defined metadata
 struct local_metadata_t {
+    bit<1> encap_flag;
+    bit<7> _pad;
 }
 
 
